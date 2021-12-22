@@ -1,6 +1,6 @@
 ---- Socket Server ----
 
-- Overview -
+-- Overview --
 
 This program runs a simple server using web sockets. 
 
