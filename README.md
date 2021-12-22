@@ -1,5 +1,10 @@
-<<<<<<< HEAD
-# socketServer
-=======
-# socket_server
->>>>>>> 533480df1db3d9709d67c79ea5642a8e302f246d
+---- Socket Server ----
+
+- Overview -
+
+This program runs a simple server using web sockets. 
+
+The server currently runs on local host and can accept sockets from browsers via HTTP.
+
+The client program simulates a client request to the server. 
+
