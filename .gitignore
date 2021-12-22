@@ -5,6 +5,6 @@ webserver.dSYM/
 # a.out
 a.out
 # header file
-webserver.h
+webserver.hpp
 #tester file
 tester.cpp
