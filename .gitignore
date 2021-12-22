@@ -1,7 +1,10 @@
-# ignore these files
+# ignore these folders
 .vscode/
 client.dSYM/
 webserver.dSYM/
+# a.out
 a.out
+# header file
 webserver.h
+#tester file
 tester.cpp
