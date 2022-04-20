@@ -1,6 +1,6 @@
----- Socket Server ----
+### Socket Server ###
 
--- Overview --
+## Overview ##
 
 This program runs a simple server using TCP/IP sockets. 
 
@@ -12,7 +12,7 @@ Resources requested are downloaded from the browser if the client has permission
 
 The client program simulates a client request to the server. 
 
--- TODO --
+## TODO ##
 
 Clients can upload data to "Resources" with the right credentials.
 
