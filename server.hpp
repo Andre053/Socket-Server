@@ -33,6 +33,7 @@ class Server {
         {}
 
         void run() {
+            std::cout << "Running server" << std::endl;
             listenLoop();
         }
 
@@ -58,7 +59,7 @@ class Server {
                     << clientPackage
                     << std::endl;
 
-                //package = buildPackage(clientPackage);
+                package = buildPackage(clientPackage);
                 //const char *pPackage = package.c_str();
 
                 //write(listenSocket, pPackage, package.length());
@@ -74,5 +75,25 @@ class Server {
             inet_ntop(AF_INET, &(address.sin_addr), ip, INET_ADDRSTRLEN);
             int port = (int)ntohs(address.sin_port);
             std::cout << "Client IP: " << ip << "\nClient Port: " << port << std::endl;
+        }
+
+        std::string buildPackage(std::string cPackage) {
+            /*
+                Check get request end point
+                if "resources" we can check for a resource within the folder
+                if within the folder, send a response back
+
+            */
+
+            std::string sPackage; // package to send back to client (download of the resource or error)
+
+            // check get request url
+            // if accessing resources endpoint
+            // check what subfolder is selected
+            // check if resource is within subfolder (if subfolder exists)
+            // build response that sends the resource (if they have permission)
+            
+            return sPackage;
+
         }
 };

@@ -11,10 +11,12 @@ class Socket {
         struct sockaddr_in socketAddress(int PORT) {
             struct sockaddr_in address;
 
+            std::cout << "Creating socket" << std::endl;
+
             char* ipAddress;
             // IP address is set as an environment variable
-            std::string ipVariable = std::getenv("IP");
-            ipAddress = &ipVariable[0];
+            // std::string ipVariable = std::getenv("IP");
+            // ipAddress = &ipVariable[0];
 
             memset((char*)&address, 0, sizeof(address));
 
@@ -23,7 +25,8 @@ class Socket {
 
             // htonl(INADDR_ANY) should connect with all available interfaces, some implementations only connect with first
             // inet_addr("127.0.0.1")
-            address.sin_addr.s_addr = inet_addr(ipAddress); 
+            // address.sin_addr.s_addr = inet_addr(ipAddress); // can use IP address from environment variable
+            address.sin_addr.s_addr = inet_addr("127.0.0.1");
 
             std::cout << "Internet address: " << address.sin_addr.s_addr << std::endl;
 

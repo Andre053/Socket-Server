@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <string.h> // needed for memset
 
 #define PORT 8080 // the port we are speaking to
 
