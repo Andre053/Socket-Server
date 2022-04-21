@@ -69,16 +69,14 @@ class Server {
 
                 bytesRead = read(listenSocket, clientPackage, 30000);
                 if (bytesRead < 0) exit(0);
-                std::cout << "Clients package has been read from the socket\n" 
-                    << clientPackage
-                    << std::endl;
+                std::cout << "Clients package has been read from the socket\n" << std::endl;
 
                 package = buildPackage(clientPackage);
-                //const char *pPackage = package.c_str();
+                const char *pPackage = package.c_str(); // string package to const char pointer
 
-                //write(listenSocket, pPackage, package.length());
+                write(listenSocket, pPackage, package.length());
 
-                //std::cout << "\n+++++++++++++++ Response Sent +++++++++++++++\n\n" << std::endl;
+                std::cout << "\n+++++++++++++++ Response Sent +++++++++++++++\n\n" << std::endl;
 				std::cout << "+++++++++++++++++++++++++++++++++++++++++++++\n" << std::endl;
                 close(listenSocket);
             }}
@@ -92,13 +90,18 @@ class Server {
         }
 
         std::string buildPackage(std::string cPackage) {
+            // TODO: Add user database that can access private files/directories
+
+
             std::string sPackage; // build package and send it out
             std::cout << "Client request is:\n\n" << cPackage << std::endl;
-            //std::cout << "Length of cPackage is: " << strlen(cPackage) << std::endl;
+
             // Must analyze the request, see what media they are asking for
             // Build a proper response
             
             // want the first 3 words of the client package
+
+
             std::string requestType;
             std::string header, req[3], media, mediaType;
             bool mediaTypeSave = false;
@@ -112,6 +115,8 @@ class Server {
                 
                 header += cPackage[i];
             }
+
+            std::cout << "The parsed header is:" << header << std::endl;
             
             if (req[0] != "GET") 
                 return "This is not an accepted HTTP request";
@@ -119,8 +124,33 @@ class Server {
             requestType = req[0];
             media = req[1];
 
-            sPackage = packageBuilder(requestType, media, mediaType); // takes request type (enum), media requested, user info
+            // takes request type, media requested, media type, user (optional)
+            sPackage = packageBuilder(requestType, media, mediaType); 
             return sPackage;
+        }
+
+        std::string packageBuilder(std::string reqType, std::string media, std::string mediaType, std::string user = "") {
+            std::string status, contents, package, contentType;
+            std::ostringstream packageBuild;
+
+            std::unordered_map<std::string, std::string> reqDetails = setUpDetails(reqType, media, mediaType, user); 
+
+            packageBuild << reqDetails["Version"] 
+                         << reqDetails["StatusCode"]
+                         << "\nDate: "
+                         << reqDetails["Date"]
+                         << "\nServer: "
+                         << reqDetails["ServerInfo"]
+                         << "\nContent-Type: " 
+                         << reqDetails["ContentType"] 
+                         << "\nContent-Length: " 
+                         << reqDetails["ContentLength"] 
+                         << "\n\n" 
+                         << reqDetails["Content"];
+
+            package = packageBuild.str();
+            std::cout << "\nPackage to send is:\n" << package << "\n" << std::endl;
+            return package;
         }
 
         std::unordered_map<std::string, std::string> setUpDetails(std::string req, std::string reqMedia, std::string mediaType, std::string user = "") {
@@ -135,10 +165,9 @@ class Server {
             md["ContentLength"] = "";
             md["Content"] = "";
 
-            // statusCode, contentType, and content are made in switch statement
+            // TODO: Add checks for data permissions
             if (!auth(user)) md["StatusCode"] = "401 Unauthorized"; // not available to user
 
-            // look for media
             md["Content"] = getMedia(reqMedia);
             md["ContentType"] = getMediaType(reqMedia);
 
@@ -165,7 +194,8 @@ class Server {
             // if found, read data from the file, send back to the response to append the data
             
             // add error check for file path
-            std::string filePath = std::getenv("RESOURCE_PATH"); // base path (use environment variable)
+            // std::getenv("RESOURCE_PATH")
+            std::string filePath = "/home/Resources/"; // base path (use environment variable)
             filePath += reqMedia;
 
             std::cout << "Looking for file at: " << filePath << "\n" << std::endl; 
@@ -177,6 +207,8 @@ class Server {
             while (getline (reqFile, text)) {
                 output += text;
             }
+
+            std::cout << "File found with output:" << output << std::endl;
 
             reqFile.close();
             return output;
@@ -209,29 +241,7 @@ class Server {
             else return "";
         }
 
-        std::string packageBuilder(std::string reqType, std::string media, std::string mediaType, std::string user = "") {
-            std::string status, contents, package, contentType;
-            std::ostringstream packageBuild;
-
-            std::unordered_map<std::string, std::string> reqDetails = setUpDetails(reqType, media, mediaType, user); 
-
-            packageBuild << reqDetails["Version"] 
-                         << reqDetails["StatusCode"]
-                         << "\nDate: "
-                         << reqDetails["Date"]
-                         << "\nServer: "
-                         << reqDetails["ServerInfo"]
-                         << "\nContent-Type: " 
-                         << reqDetails["ContentType"] 
-                         << "\nContent-Length: " 
-                         << reqDetails["ContentLength"] 
-                         << "\n\n" 
-                         << reqDetails["Content"];
-
-            package = packageBuild.str();
-            std::cout << "\nPackage to send is:\n" << package << "\n" << std::endl;
-            return package;
-        }
+        
 
         bool auth(std::string u) {
             return true;
