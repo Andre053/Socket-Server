@@ -5,7 +5,10 @@
 #include <arpa/inet.h> // gives access to inet_ntop/pton - converts binary address to string or vice versa
 #include "socket.hpp"
 #include <typeinfo> // type checking for command line inputs
-
+#include <unordered_map>
+#include <ctime>
+#include <sstream>
+#include <fstream>
 
 class Server {
     private:
@@ -78,22 +81,148 @@ class Server {
         }
 
         std::string buildPackage(std::string cPackage) {
-            /*
-                Check get request end point
-                if "resources" we can check for a resource within the folder
-                if within the folder, send a response back
-
-            */
-
-            std::string sPackage; // package to send back to client (download of the resource or error)
-
-            // check get request url
-            // if accessing resources endpoint
-            // check what subfolder is selected
-            // check if resource is within subfolder (if subfolder exists)
-            // build response that sends the resource (if they have permission)
+            std::string sPackage; // build package and send it out
+            std::cout << "Client request is:\n\n" << cPackage << std::endl;
+            //std::cout << "Length of cPackage is: " << strlen(cPackage) << std::endl;
+            // Must analyze the request, see what media they are asking for
+            // Build a proper response
             
-            return sPackage;
+            // want the first 3 words of the client package
+            std::string requestType;
+            std::string header, req[3], media, mediaType;
+            bool mediaTypeSave = false;
+            int count = 0;
+            for (int i = 0; i < cPackage.length(); i++) {
+                if (cPackage[i] == ' ') count++;
+                else req[count] += cPackage[i];
+                if (cPackage[i] == ' ') mediaTypeSave = true;
+                if (count == 1 && mediaTypeSave) mediaType += cPackage[i];
+                if (count > 2) break;
+                
+                header += cPackage[i];
+            }
+            
+            if (req[0] != "GET") 
+                return "This is not an accepted HTTP request";
 
+            requestType = req[0];
+            media = req[1];
+
+            sPackage = packageBuilder(requestType, media, mediaType); // takes request type (enum), media requested, user info
+            return sPackage;
+        }
+
+        std::unordered_map<std::string, std::string> setUpDetails(std::string req, std::string reqMedia, std::string mediaType, std::string user = "") {
+            
+            std::unordered_map<std::string, std::string> md; // message details
+
+            md["Version"] = "HTTP/1.1 ";
+            md["StatusCode"] = "";
+            md["Date"] = "";
+            md["ServerInfo"] = "Some secret server";
+            md["ContentType"] = "";
+            md["ContentLength"] = "";
+            md["Content"] = "";
+
+            // statusCode, contentType, and content are made in switch statement
+            if (!auth(user)) md["StatusCode"] = "401 Unauthorized"; // not available to user
+
+            // look for media
+            md["Content"] = getMedia(reqMedia);
+            md["ContentType"] = getMediaType(reqMedia);
+
+            if (md["Content"].empty()) 
+            {
+                md["Content"] = "No media present";
+                md["StatusCode"] = "404 Not Found"; 
+            }
+            else md["StatusCode"] = "200 OK";
+            
+            time_t currTime(0);
+            std::stringstream cTime;
+            cTime << currTime;
+            std::string now = cTime.str();
+
+            md["Date"] = now;
+            md["ContentLength"] = md["Content"].length();
+
+            return md;
+        }
+
+        std::string getMedia(std::string reqMedia) {
+            // look for the file
+            // if found, read data from the file, send back to the response to append the data
+            
+            // add error check for file path
+            std::string filePath = std::getenv("RESOURCE_PATH"); // base path (use environment variable)
+            filePath += reqMedia;
+
+            std::cout << "Looking for file at: " << filePath << "\n" << std::endl; 
+
+            std::ifstream reqFile(filePath);
+            std::string output, text;
+
+            
+            while (getline (reqFile, text)) {
+                output += text;
+            }
+
+            reqFile.close();
+            return output;
+        }
+
+        std::string getMediaType(std::string media) {
+            // check file extension 
+            std::string extension = media.substr(media.find_last_of(".") + 1);
+            
+            if (extension == "rtf") 
+            {
+                std::cout << "RTF Media" << std::endl;
+                return "text/rtf";
+            }
+            else if (extension == "txt")
+            {
+                std::cout << "TXT Media" << std::endl;
+                return "text/txt";
+            }
+            else if (extension == "html")
+            {
+                std::cout << "HTML Media" << std::endl;
+                return "text/html";
+            }
+            else if (extension == "pdf") 
+            {
+                std::cout << "PDF Media" << std::endl;
+                return "application/pdf";
+            }
+            else return "";
+        }
+
+        std::string packageBuilder(std::string reqType, std::string media, std::string mediaType, std::string user = "") {
+            std::string status, contents, package, contentType;
+            std::ostringstream packageBuild;
+
+            std::unordered_map<std::string, std::string> reqDetails = setUpDetails(reqType, media, mediaType, user); 
+
+            packageBuild << reqDetails["Version"] 
+                         << reqDetails["StatusCode"]
+                         << "\nDate: "
+                         << reqDetails["Date"]
+                         << "\nServer: "
+                         << reqDetails["ServerInfo"]
+                         << "\nContent-Type: " 
+                         << reqDetails["ContentType"] 
+                         << "\nContent-Length: " 
+                         << reqDetails["ContentLength"] 
+                         << "\n\n" 
+                         << reqDetails["Content"];
+
+            package = packageBuild.str();
+            std::cout << "\nPackage to send is:\n" << package << "\n" << std::endl;
+            return package;
+        }
+
+        bool auth(std::string u) {
+            return true;
         }
 };
