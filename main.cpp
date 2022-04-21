@@ -1,5 +1,15 @@
 #include "server.hpp"
 
+/*
+
+	### Main ###
+
+	Compile this file as it is the root of the server.
+	The file requires a port number and backlog count be passed as CL arguments.
+	Running the compiled executable will start the server in the current terminal.
+
+*/
+
 
 // takes command line arguments
 // argc : count of arguments, includes the name of the file

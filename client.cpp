@@ -8,6 +8,16 @@
 
 #define PORT 8080 // the port we are speaking to
 
+/*
+	### Client Connection Emulator ###
+
+	This short program simulates connecting to our web server.
+	We must run in a separate terminal and we can see the interaction between client and server.
+
+	Used this for early testing purposes, now the server has been specified to work with HTTP GET requests.
+
+*/
+
 int run(std::string package)
 {
 	

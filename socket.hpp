@@ -3,6 +3,13 @@
 #include <string.h> // gives memset: sets memory at pointer location
 #include <cstdlib> // getenv function
 
+/*
+    ### Socket Class ###
+
+    Basic class to initialize a TCP/IP socket
+    Will make it such that it will look for an IP address environment variable, if not found will connect to any address
+*/
+
 class Socket {
     private:
         const int socketId;

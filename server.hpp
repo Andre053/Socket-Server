@@ -10,6 +10,17 @@
 #include <sstream>
 #include <fstream>
 
+/*
+    ### Server Class ###
+
+    Initializes sockets required to listen on a port. 
+    Runs an infinite loop, serving requests with responses and then listening for new requests
+
+    Configuring it such that there is a shared directory on the host device that users can request files from.
+    Will add options to upload files to the shared directory as well.
+
+*/
+
 class Server {
     private:
         Socket socket;
