@@ -16,7 +16,10 @@
 // argv : array of arguments passed
 int main(int argc, char *argv[]) {
 
-	if (argc < 3) return 0;
+	if (argc < 3) {
+		std::cout << "Proper arguments were not passed, please pass a port number and backlog count" << std::endl;
+		return 0;
+	}
 	int PORT = atoi(argv[1]), BACKLOG = atoi(argv[2]);
 
 	std::cout << "Port: " << PORT << "\nBacklog: " << BACKLOG << std::endl;

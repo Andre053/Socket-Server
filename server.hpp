@@ -130,6 +130,10 @@ class Server {
         }
 
         std::string packageBuilder(std::string reqType, std::string media, std::string mediaType, std::string user = "") {
+            /*
+                Create the package to be sent back to the client
+            */
+            
             std::string status, contents, package, contentType;
             std::ostringstream packageBuild;
 
@@ -154,7 +158,10 @@ class Server {
         }
 
         std::unordered_map<std::string, std::string> setUpDetails(std::string req, std::string reqMedia, std::string mediaType, std::string user = "") {
-            
+            /*
+                Set up all parts of the HTTP response to be sent
+                back to the client, saved as key-value pairs
+            */
             std::unordered_map<std::string, std::string> md; // message details
 
             md["Version"] = "HTTP/1.1 ";
@@ -190,6 +197,12 @@ class Server {
         }
 
         std::string getMedia(std::string reqMedia) {
+            /*
+                Use the requested media name to search for the file within
+                the Resources folder, the file is than read line by line and 
+                returned as a string to be passed as part of the HTTP response
+            
+            */
             // look for the file
             // if found, read data from the file, send back to the response to append the data
             
@@ -215,7 +228,11 @@ class Server {
         }
 
         std::string getMediaType(std::string media) {
-            // check file extension 
+            /*
+                check the media file name (which includes a file type)
+                parse that file type and return it for HTTP response
+            
+            */
             std::string extension = media.substr(media.find_last_of(".") + 1);
             
             if (extension == "rtf") 
@@ -242,7 +259,7 @@ class Server {
         }
 
         
-
+        // must add authentication and database
         bool auth(std::string u) {
             return true;
         }

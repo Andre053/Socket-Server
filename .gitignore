@@ -9,3 +9,4 @@ webserver.hpp
 #tester file
 tester.cpp
 Resources/
+.DS_Store
